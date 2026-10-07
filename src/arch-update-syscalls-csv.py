@@ -220,6 +220,9 @@ def update_syscalls_dict(args, columns, syscalls, kver):
 
         table_path = os.path.join(args.datapath, 'tables-{}'.format(kver),
                                   'syscalls-{}'.format(arch))
+        if not os.path.exists(table_path):
+            # This architecture is not present in this kernel version
+            continue
 
         with open(table_path, 'r') as tblf:
             for line in tblf:

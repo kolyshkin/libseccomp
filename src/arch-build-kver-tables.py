@@ -31,6 +31,7 @@
 from subprocess import TimeoutExpired
 import subprocess
 import argparse
+import shutil
 import os
 
 kernel_versions = ['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7',
@@ -133,12 +134,22 @@ def main(args):
         if ret != 0:
             raise RuntimeError('Failed to update tables: {}'.format(ret))
 
+        # update-tables.sh only regenerates the tables for the architectures
+        # present in this kernel version.  The other tables in data/tables
+        # are leftovers (e.g. from a newer kernel version), so only copy the
+        # tables that were generated for this kernel.
+        arch_path = os.path.join(args.datapath,
+                                 'data/architectures-present-in-kernel.text')
+        with open(arch_path, 'r') as archf:
+            arches = [arch.strip() for arch in archf if arch.strip()]
+
         src_path = os.path.join(args.datapath, 'data/tables')
         dest_path = os.path.join(os.getcwd(), 'tables-{}'.format(kver))
-        cp_cmd = 'cp -r {} {}'.format(src_path, dest_path)
-        ret, out, err = run(cp_cmd, shell=True)
-        if ret != 0:
-            raise RuntimeError('Table copy failed: {}'.format(ret))
+        shutil.rmtree(dest_path, ignore_errors=True)
+        os.makedirs(dest_path)
+        for arch in arches:
+            shutil.copy(os.path.join(src_path, 'syscalls-{}'.format(arch)),
+                        dest_path)
 
 if __name__ == '__main__':
     args = parse_args()
