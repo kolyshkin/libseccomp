@@ -20,13 +20,7 @@
 # along with this library; if not, see <http://www.gnu.org/licenses>.
 #
 
-#######################################################
-#### WARNING - to generate proper headers for x32, you
-####           must install the glibc 32-bit headers
-####
-####           apt install libc6-dev-x32
-####
-#######################################################
+# See doc/admin/SYSCALL_KVER_TABLES.md for the requirements and usage.
 
 from subprocess import TimeoutExpired
 import subprocess
